@@ -1,0 +1,45 @@
+# Use the official PHP image with Apache
+FROM php:8.2-apache
+
+# Set the working directory
+WORKDIR /var/www/html
+
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && a2enmod rewrite
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy the project files into the container
+COPY . .
+
+# Create necessary directories for caching, logging, and session storage
+RUN mkdir -p storage/framework/cache && \
+    mkdir -p storage/framework/sessions && \
+    mkdir -p storage/framework/views && \
+    mkdir -p storage/logs && \
+    mkdir -p bootstrap/cache
+# Set the ownership and permissions
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
+# Install project dependencies without running package discovery
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Set up the Apache virtual host (adjust the path as needed)
+COPY mylaravelapp.conf /etc/apache2/sites-available/000-default.conf
+# Enable the new virtual host
+RUN a2ensite 000-default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start the Apache server
+CMD ["apache2-foreground"]

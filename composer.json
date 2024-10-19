@@ -30,7 +30,7 @@
         "tabuna/breadcrumbs": "^2.2"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.2",
+        "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.6",
         "brianium/paratest": "^6.2",
         "facade/ignition": "^2.5",
@@ -98,7 +98,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
